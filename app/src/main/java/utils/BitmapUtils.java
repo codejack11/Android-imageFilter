@@ -22,6 +22,7 @@ import java.io.OutputStream;
 public class BitmapUtils {
     private static final String TAG = BitmapUtils.class.getSimpleName();
 
+    //get default image from assets
     public static Bitmap getBitmapFromAssets( Context context, String fileName, int width, int height ){
         AssetManager assetManager = context.getAssets();
 
@@ -31,7 +32,7 @@ public class BitmapUtils {
             final BitmapFactory.Options options = new BitmapFactory.Options();
             options.inJustDecodeBounds = true;
 
-            istr = assetManager.open(fileName);
+            istr = assetManager.open("sample.jpg");
 
             //calculate sample size
             options.inSampleSize = calculateInSampleSize(options, width, height);

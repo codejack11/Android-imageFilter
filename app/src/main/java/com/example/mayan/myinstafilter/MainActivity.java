@@ -3,8 +3,11 @@ package com.example.mayan.myinstafilter;
 import android.Manifest;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
@@ -15,7 +18,6 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -43,7 +45,7 @@ public class MainActivity extends AppCompatActivity implements FiltersListFragme
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
-    public static final String IMAGE_NAME = "dog.jpg";
+    public static final String IMAGE_NAME = "sample.jpg";
 
     public static final int SELECT_GALLERY_IMAGE = 101;
 
@@ -56,7 +58,7 @@ public class MainActivity extends AppCompatActivity implements FiltersListFragme
     @BindView(R.id.viewpager)
     ViewPager viewPager;
 
-    @BindView(R.id.coordinator_layout)
+    //@BindView(R.id.coordinator_layout)
     CoordinatorLayout coordinatorLayout;
 
     Bitmap originalImage;
@@ -217,6 +219,7 @@ public class MainActivity extends AppCompatActivity implements FiltersListFragme
         filteredImage = originalImage.copy(Bitmap.Config.ARGB_8888, true);
         finalImage = originalImage.copy(Bitmap.Config.ARGB_8888, true);
         imagePreview.setImageBitmap(originalImage);
+
     }
 
     @Override
@@ -236,6 +239,11 @@ public class MainActivity extends AppCompatActivity implements FiltersListFragme
 
         if (id == R.id.action_save) {
             saveImageToGallery();
+            return true;
+        }
+
+        if (id == R.id.action_share){
+            shareImage();
             return true;
         }
 
@@ -293,13 +301,15 @@ public class MainActivity extends AppCompatActivity implements FiltersListFragme
                     @Override
                     public void onPermissionsChecked(MultiplePermissionsReport report) {
                         if (report.areAllPermissionsGranted()) {
-                            final String path = BitmapUtils.insertImage(getContentResolver(), finalImage, System.currentTimeMillis() + "_profile.jpg", null);
+                            final String path = BitmapUtils.insertImage(getContentResolver(), finalImage, System.currentTimeMillis() + "profile.jpg", null);
+
                             if (!TextUtils.isEmpty(path)) {
                                 Snackbar snackbar = Snackbar
                                         .make(coordinatorLayout, "Image saved to gallery!", Snackbar.LENGTH_LONG)
                                         .setAction("OPEN", new View.OnClickListener() {
                                             @Override
                                             public void onClick(View view) {
+
                                                 openImage(path);
                                             }
                                         });
@@ -330,5 +340,17 @@ public class MainActivity extends AppCompatActivity implements FiltersListFragme
         intent.setAction(Intent.ACTION_VIEW);
         intent.setDataAndType(Uri.parse(path), "image/*");
         startActivity(intent);
+    }
+
+    //share image
+    private void shareImage(){
+        Intent shareIntent = new Intent();
+        String bitmapPath = MediaStore.Images.Media.insertImage(getContentResolver(), finalImage,"title", null);
+        Uri imageUri = Uri.parse(bitmapPath);
+        shareIntent.setAction(Intent.ACTION_SEND);
+        shareIntent.putExtra(Intent.EXTRA_STREAM, imageUri );
+
+        shareIntent.setType("image/*");
+        startActivity(Intent.createChooser(shareIntent, "Share images to.."));
     }
 }
