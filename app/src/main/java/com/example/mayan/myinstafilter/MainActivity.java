@@ -58,7 +58,7 @@ public class MainActivity extends AppCompatActivity implements FiltersListFragme
     @BindView(R.id.viewpager)
     ViewPager viewPager;
 
-    //@BindView(R.id.coordinator_layout)
+    @BindView(R.id.coordinator_layout)
     CoordinatorLayout coordinatorLayout;
 
     Bitmap originalImage;
